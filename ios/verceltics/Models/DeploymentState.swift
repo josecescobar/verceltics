@@ -38,7 +38,8 @@ nonisolated enum DeploymentState: String, CaseIterable, Codable, Equatable, Send
         }
     }
 
-    /// True when the deployment settled without shipping.
+    /// True only when the deployment errored. Canceled and superseded deploys also never shipped,
+    /// but neither is something to alert someone about.
     var isFailure: Bool {
         self == .failed
     }
