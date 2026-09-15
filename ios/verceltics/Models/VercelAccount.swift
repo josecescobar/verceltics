@@ -1,6 +1,6 @@
 import Foundation
 
-enum AccountProvider: String, Codable, CaseIterable, Identifiable, Sendable {
+enum AccountProvider: String, Codable, CaseIterable, Identifiable, Hashable, Sendable {
     case vercel
     case cloudflare
     case netlify

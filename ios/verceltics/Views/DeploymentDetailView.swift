@@ -93,10 +93,12 @@ struct DeploymentDetailView: View {
     @Environment(AuthManager.self) private var authManager
     @Environment(\.horizontalSizeClass) private var hSize
     @State private var vm: DeploymentDetailViewModel
+    @State private var liveStatus: String
 
     init(project: Project, deployment: RecentDeployment, initialToken: String? = nil) {
         self.project = project
         self.deployment = deployment
+        _liveStatus = State(initialValue: deployment.displayState)
         _vm = State(initialValue: DeploymentDetailViewModel(
             token: initialToken,
             deployment: deployment,
@@ -122,6 +124,7 @@ struct DeploymentDetailView: View {
         .navigationBarTitleDisplayMode(.inline)
         .task {
             await loadEvents()
+            await watchDeployment()
         }
         .refreshable {
             await loadEvents(forceRefresh: true)
@@ -173,7 +176,7 @@ struct DeploymentDetailView: View {
 
                 Spacer(minLength: 8)
 
-                statusPill(deployment.displayState)
+                statusPill(liveStatus)
             }
 
             HStack(spacing: 10) {
@@ -305,6 +308,22 @@ struct DeploymentDetailView: View {
         )
     }
 
+    private func watchDeployment() async {
+        guard let token = authManager.token else { return }
+        let snapshot = deployment.ambientSnapshot(project: project)
+        AmbientAwareness.shared.publish(deployments: [snapshot])
+        AmbientAwareness.shared.watch(snapshot, onStatus: { status in
+            liveStatus = status
+        }) {
+            let fetched = try? await VercelAPI(token: token).fetchDeployment(
+                id: deployment.id,
+                projectId: project.id,
+                teamId: project.teamId
+            )
+            return fetched?.displayState
+        }
+    }
+
     private func infoPanel<Content: View>(
         title: String,
         icon: String,
@@ -411,7 +430,7 @@ struct DeploymentDetailView: View {
     }
 
     private func statusPill(_ state: String) -> some View {
-        AppStatusBadge(text: state.capitalized, tone: .status(state))
+        AppStatusBadge(text: state.capitalized, tone: .deployment(state, provider: .vercel))
     }
 
     private func eventColor(_ event: DeploymentEvent) -> Color {
@@ -432,7 +451,7 @@ struct DeploymentDetailView: View {
     }
 
     private func statusColor(_ state: String) -> Color {
-        AppStatusTone.status(state).color
+        AppStatusTone.deployment(state, provider: .vercel).color
     }
 }
 

@@ -55,6 +55,12 @@ final class HostingResourceDetailViewModel {
             deployments = loaded
             hasLoadedSnapshot = true
             Self.cachedDeployments[cacheKey] = CacheEntry(deployments: loaded, updatedAt: .now)
+            AmbientAwareness.shared.publishHosting(
+                deployments: loaded,
+                resource: resource,
+                provider: api.provider,
+                fetch: { (try? await self.api.fetchDeployments(for: resource)) ?? [] }
+            )
         }
         catch is CancellationError {
             // Going back can cancel a request; keep cached data intact.
@@ -278,7 +284,7 @@ struct HostingResourceDetailView: View {
                     .foregroundStyle(AppTheme.textPrimary)
                     .lineLimit(2)
                 Spacer(minLength: 8)
-                AppStatusBadge(text: deployment.status, tone: .status(deployment.status))
+                AppStatusBadge(text: deployment.status, tone: .deployment(deployment.status, provider: provider))
             }
             if let message = deployment.commitMessage, !message.isEmpty {
                 Text(message)

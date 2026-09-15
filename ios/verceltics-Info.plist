@@ -17,5 +17,15 @@
 	<string>804271028953-rc53qhcvdki0rpe2pe98gsahs8dimem7.apps.googleusercontent.com</string>
 	<key>GoogleOAuthRedirectScheme</key>
 	<string>com.googleusercontent.apps.804271028953-rc53qhcvdki0rpe2pe98gsahs8dimem7</string>
+	<key>NSSupportsLiveActivities</key>
+	<true/>
+	<key>BGTaskSchedulerPermittedIdentifiers</key>
+	<array>
+		<string>com.apoorvdarshan.verceltics.refresh</string>
+	</array>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+	</array>
 </dict>
 </plist>

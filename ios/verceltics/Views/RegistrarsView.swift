@@ -68,6 +68,7 @@ final class RegistrarDashboardViewModel {
                 domains: loadedDomains,
                 updatedAt: updatedAt
             )
+            AmbientAwareness.shared.publishRegistrarDomains(loadedDomains)
         } catch is CancellationError {
             // Switching tabs can cancel a request; keep any cached content.
         } catch {
