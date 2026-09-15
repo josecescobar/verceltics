@@ -209,6 +209,16 @@ actor VercelAPI {
         return response.deployments
     }
 
+    /// Re-reads a single deployment so an in-flight build can be polled to its terminal state.
+    ///
+    /// This intentionally reuses the `/v6/deployments` list rather than `/v13/deployments/{id}`:
+    /// the list response is already covered by the `RecentDeployment` decoder, whereas the single
+    /// resource returns a different shape and would need a second decoder to stay in sync.
+    func fetchDeployment(id: String, projectId: String, teamId: String?, searchLimit: Int = 20) async throws -> RecentDeployment? {
+        let deployments = try await fetchDeployments(projectId: projectId, teamId: teamId, limit: searchLimit)
+        return deployments.first { $0.id == id }
+    }
+
     func fetchDeploymentEvents(idOrUrl: String, teamId: String?, limit: Int = 80) async throws -> [DeploymentEvent] {
         var items = projectQueryItems(teamId: teamId)
         items.append(URLQueryItem(name: "direction", value: "backward"))

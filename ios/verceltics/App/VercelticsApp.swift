@@ -27,6 +27,10 @@ struct VercelticsApp: App {
         _siteStore = State(initialValue: SiteStore())
 #endif
 
+#if canImport(BackgroundTasks)
+        AmbientBackgroundRefresh.register()
+        AmbientBackgroundRefresh.schedule()
+#endif
     }
 
     private var hasAnyConnection: Bool {
