@@ -9,7 +9,7 @@ import Foundation
 ///
 /// This type is deliberately Foundation-only so it can be shared with an extension target and
 /// covered by unit tests.
-nonisolated enum DeploymentState: String, CaseIterable, Equatable, Sendable {
+nonisolated enum DeploymentState: String, CaseIterable, Codable, Equatable, Sendable {
     case queued
     case initializing
     case building
@@ -57,6 +57,15 @@ nonisolated enum DeploymentState: String, CaseIterable, Equatable, Sendable {
         case .superseded: "Superseded"
         case .unknown: "Unknown"
         }
+    }
+
+    // MARK: - Persistence
+
+    /// Decodes leniently so a snapshot written by a newer build, which may know states this one
+    /// does not, degrades to `.unknown` instead of failing the whole payload.
+    init(from decoder: any Decoder) throws {
+        let raw = try decoder.singleValueContainer().decode(String.self)
+        self = DeploymentState(rawValue: raw) ?? .unknown
     }
 
     // MARK: - Normalization
