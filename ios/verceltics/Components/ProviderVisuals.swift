@@ -308,6 +308,22 @@ enum AppStatusTone {
         }
         return .neutral
     }
+
+    /// Tone for a deployment status, resolved against the vocabulary of the provider that produced
+    /// it. Unrecognized values fall through to ``status(_:)`` so provider strings this table does
+    /// not cover keep their previous appearance.
+    static func deployment(_ value: String, provider: AccountProvider) -> AppStatusTone {
+        switch DeploymentState(rawStatus: value, provider: provider) {
+        case .queued, .initializing: .warning
+        case .building, .deploying: .progress
+        case .ready: .success
+        // A canceled deployment is not an error, but it has always read as one here; keeping the
+        // tone avoids changing established UX alongside the classification fixes.
+        case .failed, .canceled: .danger
+        case .superseded: .neutral
+        case .unknown: status(value)
+        }
+    }
 }
 
 struct AppStatusBadge: View {

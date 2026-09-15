@@ -922,7 +922,10 @@ struct AnalyticsView: View {
                         .foregroundStyle(AppTheme.textPrimary)
                         .lineLimit(1)
 
-                    AppStatusBadge(text: deployment.displayState.capitalized, tone: .status(deployment.displayState))
+                    AppStatusBadge(
+                        text: deployment.displayState.capitalized,
+                        tone: .deployment(deployment.displayState, provider: .vercel)
+                    )
                 }
 
                 HStack(spacing: 6) {
@@ -966,7 +969,7 @@ struct AnalyticsView: View {
     }
 
     private func deploymentStatusColor(_ state: String) -> Color {
-        AppStatusTone.status(state).color
+        AppStatusTone.deployment(state, provider: .vercel).color
     }
 
     // MARK: - Breakdown Card

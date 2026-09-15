@@ -411,7 +411,7 @@ struct DeploymentDetailView: View {
     }
 
     private func statusPill(_ state: String) -> some View {
-        AppStatusBadge(text: state.capitalized, tone: .status(state))
+        AppStatusBadge(text: state.capitalized, tone: .deployment(state, provider: .vercel))
     }
 
     private func eventColor(_ event: DeploymentEvent) -> Color {
@@ -432,7 +432,7 @@ struct DeploymentDetailView: View {
     }
 
     private func statusColor(_ state: String) -> Color {
-        AppStatusTone.status(state).color
+        AppStatusTone.deployment(state, provider: .vercel).color
     }
 }
 

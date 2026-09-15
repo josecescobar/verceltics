@@ -278,7 +278,7 @@ struct HostingResourceDetailView: View {
                     .foregroundStyle(AppTheme.textPrimary)
                     .lineLimit(2)
                 Spacer(minLength: 8)
-                AppStatusBadge(text: deployment.status, tone: .status(deployment.status))
+                AppStatusBadge(text: deployment.status, tone: .deployment(deployment.status, provider: provider))
             }
             if let message = deployment.commitMessage, !message.isEmpty {
                 Text(message)
