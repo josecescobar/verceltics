@@ -42,6 +42,30 @@ A catalog entry is not considered provider parity. A provider is complete only a
 
 The matrix describes source parity, not store availability. It should be updated whenever a provider passes or falls back from the completion gates above.
 
+## Ambient deploy awareness (iOS)
+
+Deployment status is normalized per provider rather than globally. Provider vocabularies collide —
+`RUNNING` is a build in progress on AWS Amplify but a healthy machine on Fly, and `active` is a
+finished deployment on DigitalOcean but an in-progress one on Cloudflare Pages — so a single
+substring matcher cannot classify all of them.
+
+- `DeploymentState` maps each provider's own vocabulary to one lifecycle and exposes `isInFlight`
+  and `isTerminal`. Unrecognized values fall back to the legacy classifier, so an unmapped provider
+  string keeps its previous appearance.
+- `AppStatusTone.deployment(_:provider:)` is used for deployment statuses. Resource health rows stay
+  on `AppStatusTone.status(_:)`, where `Running` legitimately means healthy.
+- `DeploymentTracker` decides when an ambient surface should present, update, or dismiss.
+  `AmbientAlertRules` decides what is worth a notification. `AmbientSnapshot` is the credential-free
+  payload an extension reads, since a widget cannot reach the app's in-memory caches.
+
+These are Foundation-only and unit tested. The ActivityKit, WidgetKit, BackgroundTasks, and
+UserNotifications layers are staged, uncompiled, in [ios/AmbientDeployAwareness](../ios/AmbientDeployAwareness/README.md),
+which documents the integration order and the capabilities that require the Apple Developer portal.
+
+Live Activities update while the app is running plus whatever `BGAppRefreshTask` windows iOS grants.
+Realtime updates while closed would need ActivityKit push tokens over APNs, and therefore a server,
+which contradicts the data boundary above. That is a deliberate tradeoff.
+
 ## Continuous integration
 
 CI keeps the native projects independent:
@@ -49,3 +73,6 @@ CI keeps the native projects independent:
 - iOS tests run with `xcodebuild` against an iOS simulator.
 - Android runs JVM tests, Android Lint, and a debug assembly through the Gradle wrapper.
 - No Flutter bootstrap, analysis, test, or framework-generation step is required.
+
+GitHub Actions must be enabled for these to run. On a fork it is disabled by default, which leaves
+`ios-tests` unable to verify iOS changes at all.
