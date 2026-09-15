@@ -9,7 +9,7 @@ import Foundation
 ///
 /// This type is deliberately Foundation-only so it can be shared with an extension target and
 /// covered by unit tests.
-nonisolated enum DeploymentState: String, CaseIterable, Codable, Equatable, Sendable {
+nonisolated enum DeploymentState: String, CaseIterable, Codable, Equatable, Hashable, Sendable {
     case queued
     case initializing
     case building

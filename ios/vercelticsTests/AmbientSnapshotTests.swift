@@ -118,6 +118,56 @@ final class AmbientSnapshotTests: XCTestCase {
         }
     }
 
+    func testLegacyPayloadsWithoutIdOrDomainsStillDecode() throws {
+        let json = """
+        {"version":1,"capturedAt":"2023-11-14T22:13:20Z","deployments":[
+          {"projectName":"verceltics","provider":"vercel","state":"ready",
+           "statusText":"READY","updatedAt":"2023-11-14T22:13:20Z"}
+        ]}
+        """
+        let snapshot = try AmbientSnapshotCodec.decode(Data(json.utf8))
+        XCTAssertEqual(snapshot.deployments.first?.id, "vercel:verceltics")
+        XCTAssertTrue(snapshot.domains.isEmpty)
+    }
+
+    func testDomainsAreKeptSoonestFirstAndBounded() {
+        let later = capturedAt.addingTimeInterval(86_400 * 40)
+        let sooner = capturedAt.addingTimeInterval(86_400 * 3)
+        let snapshot = AmbientSnapshot(
+            capturedAt: capturedAt,
+            deployments: [],
+            domains: (0..<20).map {
+                AmbientDomainSnapshot(
+                    name: "d\($0).com",
+                    expiresAt: $0 == 0 ? later : sooner.addingTimeInterval(Double($0))
+                )
+            }
+        )
+        XCTAssertEqual(snapshot.domains.count, AmbientSnapshot.maxEntries)
+        XCTAssertEqual(snapshot.domains.first?.name, "d1.com")
+        XCTAssertFalse(snapshot.domains.contains(where: { $0.name == "d0.com" }))
+    }
+
+    func testSnapshotStorePrefersTheAppGroupOverApplicationSupport() {
+        let appGroup = URL(fileURLWithPath: "/tmp/app-group")
+        let support = URL(fileURLWithPath: "/tmp/application-support")
+        XCTAssertEqual(
+            AmbientSnapshotStore.resolveDirectory(appGroup: appGroup, applicationSupport: support),
+            appGroup.appendingPathComponent("Ambient", isDirectory: true)
+        )
+    }
+
+    func testSnapshotStoreFallsBackToApplicationSupport() {
+        let support = URL(fileURLWithPath: "/tmp/application-support")
+        XCTAssertEqual(
+            AmbientSnapshotStore.resolveDirectory(appGroup: nil, applicationSupport: support),
+            support
+                .appendingPathComponent("Verceltics", isDirectory: true)
+                .appendingPathComponent("Ambient", isDirectory: true)
+        )
+        XCTAssertNil(AmbientSnapshotStore.resolveDirectory(appGroup: nil, applicationSupport: nil))
+    }
+
     func testAnUnrecognizedStateDecodesAsUnknownRatherThanFailing() throws {
         // Forward compatibility: a snapshot from a newer build must not break the whole payload.
         let json = """

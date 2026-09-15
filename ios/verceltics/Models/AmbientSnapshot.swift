@@ -5,6 +5,7 @@ import Foundation
 /// `statusText` keeps the provider's own wording, because a Vercel user expects to read `READY`,
 /// while `state` carries the normalized meaning used for tone and in-flight decisions.
 nonisolated struct AmbientDeploymentSnapshot: Codable, Equatable, Sendable {
+    let id: String
     let projectName: String
     let provider: AccountProvider
     let state: DeploymentState
@@ -14,6 +15,7 @@ nonisolated struct AmbientDeploymentSnapshot: Codable, Equatable, Sendable {
     let commitSubject: String?
 
     init(
+        id: String? = nil,
         projectName: String,
         provider: AccountProvider,
         state: DeploymentState,
@@ -22,6 +24,7 @@ nonisolated struct AmbientDeploymentSnapshot: Codable, Equatable, Sendable {
         targetURL: String? = nil,
         commitSubject: String? = nil
     ) {
+        self.id = id ?? "\(provider.rawValue):\(projectName)"
         self.projectName = projectName
         self.provider = provider
         self.state = state
@@ -29,6 +32,21 @@ nonisolated struct AmbientDeploymentSnapshot: Codable, Equatable, Sendable {
         self.updatedAt = updatedAt
         self.targetURL = targetURL
         self.commitSubject = commitSubject
+    }
+
+    var trackingKey: String { "\(provider.rawValue):\(id)" }
+
+    init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        projectName = try container.decode(String.self, forKey: .projectName)
+        provider = try container.decode(AccountProvider.self, forKey: .provider)
+        state = try container.decode(DeploymentState.self, forKey: .state)
+        statusText = try container.decode(String.self, forKey: .statusText)
+        updatedAt = try container.decode(Date.self, forKey: .updatedAt)
+        targetURL = try container.decodeIfPresent(String.self, forKey: .targetURL)
+        commitSubject = try container.decodeIfPresent(String.self, forKey: .commitSubject)
+        id = try container.decodeIfPresent(String.self, forKey: .id)
+            ?? "\(provider.rawValue):\(projectName)"
     }
 }
 
@@ -38,6 +56,11 @@ nonisolated struct AmbientDeploymentSnapshot: Codable, Equatable, Sendable {
 /// to hand it a small, self-describing payload. This deliberately carries no credentials: it holds
 /// only what is already on screen, so it can live at rest under file protection without widening
 /// what an extension is trusted with.
+nonisolated struct AmbientDomainSnapshot: Codable, Equatable, Sendable {
+    let name: String
+    let expiresAt: Date
+}
+
 nonisolated struct AmbientSnapshot: Codable, Equatable, Sendable {
     static let currentVersion = 1
 
@@ -47,8 +70,13 @@ nonisolated struct AmbientSnapshot: Codable, Equatable, Sendable {
     let version: Int
     let capturedAt: Date
     let deployments: [AmbientDeploymentSnapshot]
+    let domains: [AmbientDomainSnapshot]
 
-    init(capturedAt: Date, deployments: [AmbientDeploymentSnapshot]) {
+    init(
+        capturedAt: Date,
+        deployments: [AmbientDeploymentSnapshot],
+        domains: [AmbientDomainSnapshot] = []
+    ) {
         self.version = Self.currentVersion
         self.capturedAt = capturedAt
         // Newest first, then truncated, so the entries a widget shows are the relevant ones.
@@ -56,6 +84,19 @@ nonisolated struct AmbientSnapshot: Codable, Equatable, Sendable {
             .sorted { $0.updatedAt > $1.updatedAt }
             .prefix(Self.maxEntries)
             .map { $0 }
+        self.domains = domains
+            .sorted { $0.expiresAt < $1.expiresAt }
+            .prefix(Self.maxEntries)
+            .map { $0 }
+    }
+
+    init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        version = try container.decode(Int.self, forKey: .version)
+        capturedAt = try container.decode(Date.self, forKey: .capturedAt)
+        deployments = try container.decode([AmbientDeploymentSnapshot].self, forKey: .deployments)
+        // Added after the first snapshots were written; older payloads stay readable.
+        domains = try container.decodeIfPresent([AmbientDomainSnapshot].self, forKey: .domains) ?? []
     }
 
     /// Whether the payload is too old to present as current.
