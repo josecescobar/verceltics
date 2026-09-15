@@ -58,9 +58,11 @@ substring matcher cannot classify all of them.
   `AmbientAlertRules` decides what is worth a notification. `AmbientSnapshot` is the credential-free
   payload an extension reads, since a widget cannot reach the app's in-memory caches.
 
-These are Foundation-only and unit tested. The ActivityKit, WidgetKit, BackgroundTasks, and
-UserNotifications layers are staged, uncompiled, in [ios/AmbientDeployAwareness](../ios/AmbientDeployAwareness/README.md),
-which documents the integration order and the capabilities that require the Apple Developer portal.
+These are Foundation-only and unit tested. The app now also runs a foreground poller, writes the
+shared snapshot, schedules local alerts, and registers `BGAppRefreshTask`. Live Activity
+*requests* are made from the app; the Lock Screen / Dynamic Island *UI* remains staged in
+[ios/AmbientDeployAwareness](../ios/AmbientDeployAwareness/README.md) until a Widget Extension
+target is added in Xcode.
 
 Live Activities update while the app is running plus whatever `BGAppRefreshTask` windows iOS grants.
 Realtime updates while closed would need ActivityKit push tokens over APNs, and therefore a server,

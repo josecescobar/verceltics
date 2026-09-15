@@ -197,6 +197,11 @@ final class AnalyticsViewModel {
             }
             if let loadedDeployments = projectContextResult.recentDeployments {
                 recentDeployments = loadedDeployments
+                AmbientAwareness.shared.publishVercel(
+                    deployments: loadedDeployments,
+                    project: project,
+                    token: token
+                )
             }
             if projectContextResult.hasCompleteResponse {
                 Self.projectContextCache[projectContextCacheKey] = CachedProjectContext(

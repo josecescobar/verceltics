@@ -55,6 +55,12 @@ final class HostingResourceDetailViewModel {
             deployments = loaded
             hasLoadedSnapshot = true
             Self.cachedDeployments[cacheKey] = CacheEntry(deployments: loaded, updatedAt: .now)
+            AmbientAwareness.shared.publishHosting(
+                deployments: loaded,
+                resource: resource,
+                provider: api.provider,
+                fetch: { (try? await self.api.fetchDeployments(for: resource)) ?? [] }
+            )
         }
         catch is CancellationError {
             // Going back can cancel a request; keep cached data intact.
