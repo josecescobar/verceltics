@@ -64,6 +64,11 @@ shared snapshot, schedules local alerts, and registers `BGAppRefreshTask`. Live 
 [ios/AmbientDeployAwareness](../ios/AmbientDeployAwareness/README.md) until a Widget Extension
 target is added in Xcode.
 
+`AppTheme` lives in its own file so a widget extension can share colors without compiling
+`ProviderVisuals.swift`. Siri and Shortcuts can ask for the latest cached deploy or open a
+workspace. Spotlight indexes projects, Cloudflare zones, registrar domains, and the ambient
+snapshot after those screens load.
+
 Live Activities update while the app is running plus whatever `BGAppRefreshTask` windows iOS grants.
 Realtime updates while closed would need ActivityKit push tokens over APNs, and therefore a server,
 which contradicts the data boundary above. That is a deliberate tradeoff.

@@ -161,6 +161,7 @@ final class ProjectsViewModel {
                 warning: loadWarning,
                 updatedAt: updatedAt
             )
+            AmbientSpotlightIndex.indexProjects(loadedProjects)
         } catch is CancellationError {
             // Tab switch — ignore, don't show error
         } catch {

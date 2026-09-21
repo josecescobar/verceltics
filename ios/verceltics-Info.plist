@@ -12,6 +12,16 @@
 				<string>com.googleusercontent.apps.804271028953-rc53qhcvdki0rpe2pe98gsahs8dimem7</string>
 			</array>
 		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>com.apoorvdarshan.verceltics</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>verceltics</string>
+			</array>
+		</dict>
 	</array>
 	<key>GoogleOAuthClientID</key>
 	<string>804271028953-rc53qhcvdki0rpe2pe98gsahs8dimem7.apps.googleusercontent.com</string>

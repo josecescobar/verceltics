@@ -230,6 +230,7 @@ final class AmbientAwareness {
             domains: Array(domains.values)
         )
         try? AmbientSnapshotStore.write(snapshot)
+        AmbientSpotlightIndex.indexSnapshot(snapshot)
         reloadWidgets()
     }
 

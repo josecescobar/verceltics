@@ -131,6 +131,14 @@ struct MainTabView: View {
             guard phase == .active else { return }
             requestBackgroundRefreshForCurrentWorkspace()
         }
+        .onAppear {
+            applyPendingAmbientRoute()
+        }
+        .onOpenURL { url in
+            guard let route = AmbientRoute.parse(url) else { return }
+            AmbientRoute.store(route)
+            applyPendingAmbientRoute()
+        }
         .task {
             guard performsUpdateCheck else { return }
             await appUpdateChecker.checkForUpdates()
@@ -179,6 +187,12 @@ struct MainTabView: View {
         case .sites:
             sitesRefreshRequestID &+= 1
         }
+    }
+
+    private func applyPendingAmbientRoute() {
+        guard let workspace = AmbientRoute.consumePendingWorkspace() else { return }
+        lastPrimaryWorkspace = workspace.rawValue
+        selectedTab = workspace.destination
     }
 
     private func requestSearch(for workspace: PrimaryWorkspace) {

@@ -409,6 +409,7 @@ final class CloudflareDashboardViewModel {
             updatedAt: previousUpdate
         )
         if let loadedCacheKey { saveCache(cacheKey: loadedCacheKey) }
+        AmbientSpotlightIndex.indexZones(zones)
     }
 
     @discardableResult
@@ -418,6 +419,7 @@ final class CloudflareDashboardViewModel {
         pagesProjects = cached.pagesProjects
         workers = cached.workers
         sectionWarnings = cached.sectionWarnings
+        AmbientSpotlightIndex.indexZones(zones)
         return true
     }
 

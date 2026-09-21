@@ -1,4 +1,7 @@
 import SwiftUI
+#if canImport(CoreSpotlight)
+import CoreSpotlight
+#endif
 
 @main
 struct VercelticsApp: App {
@@ -67,6 +70,18 @@ struct VercelticsApp: App {
             .environment(registrarStore)
             .environment(siteStore)
             .preferredColorScheme(appearanceStore.selection.preferredColorScheme)
+            .onOpenURL { url in
+                guard let route = AmbientRoute.parse(url) else { return }
+                AmbientRoute.store(route)
+            }
+#if canImport(CoreSpotlight)
+            .onContinueUserActivity(CSSearchableItemActionType) { activity in
+                guard let identifier = activity.userInfo?[CSSearchableItemActivityIdentifier] as? String else {
+                    return
+                }
+                AmbientRoute.store(SpotlightRecordBuilder.route(forUniqueIdentifier: identifier))
+            }
+#endif
             .task(id: firstLaunchMigrationState) {
 #if DEBUG
                 guard !AppDebugFixtures.usesIsolatedAccountStores else { return }
