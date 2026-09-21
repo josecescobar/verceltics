@@ -23,8 +23,8 @@ need a Widget Extension target, which should be created in Xcode rather than han
    - `ios/verceltics/Ambient/DeployActivityAttributes.swift`
 4. Add an **App Group** `group.com.apoorvdarshan.verceltics` to both targets. Until that exists,
    the app writes the snapshot to Application Support, which only the app can read.
-5. The extension needs `AppTheme` tokens. Either add `ProviderVisuals.swift` or lift the few
-   colors `DeployLiveActivity` uses.
+5. Add `ios/verceltics/Components/AppTheme.swift` to the extension target. That file is the
+   shared color tokens; do not add `ProviderVisuals.swift`.
 
 `DeployActivityAttributes.swift` in this folder is the earlier draft. Prefer the copy in
 `ios/verceltics/Ambient/` so the app and the extension share one type.
