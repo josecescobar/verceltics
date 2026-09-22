@@ -7,8 +7,8 @@ import WidgetKit
 ///
 /// Views hand it whatever they just loaded. It writes the shared snapshot, raises alerts on
 /// genuine transitions, and starts a foreground poller for anything still in flight. Live
-/// Activity presentation is attempted when ActivityKit is available; without a widget extension
-/// iOS will simply refuse the request.
+/// Activity presentation is requested here; `VercelticsWidgets` renders the Lock Screen
+/// and Dynamic Island. WidgetKit timelines reload whenever the snapshot is written.
 @MainActor
 final class AmbientAwareness {
     static let shared = AmbientAwareness()

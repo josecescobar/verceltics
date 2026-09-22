@@ -156,3 +156,38 @@ struct DeployStatusView: View {
         }
     }
 }
+
+#if DEBUG
+#Preview("Small", as: .systemSmall) {
+    DeployStatusWidget()
+} timeline: {
+    DeployStatusEntry(
+        date: .now,
+        deployment: AmbientDeploymentSnapshot(
+            projectName: "verceltics",
+            provider: .vercel,
+            state: .building,
+            statusText: "BUILDING",
+            updatedAt: .now
+        ),
+        isStale: false
+    )
+    DeployStatusEntry(date: .now, deployment: nil, isStale: false)
+}
+
+#Preview("Medium", as: .systemMedium) {
+    DeployStatusWidget()
+} timeline: {
+    DeployStatusEntry(
+        date: .now,
+        deployment: AmbientDeploymentSnapshot(
+            projectName: "marketing",
+            provider: .netlify,
+            state: .ready,
+            statusText: "READY",
+            updatedAt: .now.addingTimeInterval(-120)
+        ),
+        isStale: false
+    )
+}
+#endif
