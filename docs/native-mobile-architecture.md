@@ -60,14 +60,19 @@ substring matcher cannot classify all of them.
 
 These are Foundation-only and unit tested. The app now also runs a foreground poller, writes the
 shared snapshot, schedules local alerts, and registers `BGAppRefreshTask`. Live Activity
-*requests* are made from the app; the Lock Screen / Dynamic Island *UI* remains staged in
-[ios/AmbientDeployAwareness](../ios/AmbientDeployAwareness/README.md) until a Widget Extension
-target is added in Xcode.
+*requests* are made from the app. The Lock Screen, Dynamic Island, and Home Screen widget UI live
+in the `VercelticsWidgets` extension. Shared types (`AccountProvider`, `DeploymentState`,
+`AmbientSnapshot`, the snapshot store, `DeployActivityAttributes`, and `AppTheme`) compile from
+`ios/SharedAmbient` into both targets.
 
-`AppTheme` lives in its own file so a widget extension can share colors without compiling
+`AppTheme` lives in SharedAmbient so the widget can share colors without compiling
 `ProviderVisuals.swift`. Siri and Shortcuts can ask for the latest cached deploy or open a
 workspace. Spotlight indexes projects, Cloudflare zones, registrar domains, and the ambient
 snapshot after those screens load.
+
+The App Group `group.com.apoorvdarshan.verceltics` is the preferred snapshot container. Until that
+group is provisioned in the developer portal, the store falls back to Application Support, which
+only the app can read. Do not add entitlements files until the group exists.
 
 Live Activities update while the app is running plus whatever `BGAppRefreshTask` windows iOS grants.
 Realtime updates while closed would need ActivityKit push tokens over APNs, and therefore a server,

@@ -15,6 +15,7 @@ struct DeployStatusWidget: Widget {
         .configurationDisplayName("Deploy status")
         .description("The latest deployment across your connected providers.")
         .supportedFamilies([.systemSmall, .systemMedium, .accessoryRectangular])
+        .widgetURL(URL(string: "verceltics://deploy/latest"))
     }
 }
 

@@ -8,11 +8,27 @@
 
 /* Begin PBXBuildFile section */
 		BA7C5F012FAE9A1200B7D0A1 /* RevenueCat in Frameworks */ = {isa = PBXBuildFile; productRef = BA7C5F002FAE9A1200B7D0A1 /* RevenueCat */; };
+		BAA2000C2FC000000000000C /* VercelticsWidgets.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = BAA200012FC0000000000001 /* VercelticsWidgets.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		BAA2000B2FC000000000000B /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				BAA2000C2FC000000000000C /* VercelticsWidgets.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		BA46B9FD2F7E8DEA000E67FA /* verceltics.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = verceltics.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BAA100012FC0000000000001 /* vercelticsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = vercelticsTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		BAA200012FC0000000000001 /* VercelticsWidgets.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = VercelticsWidgets.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -26,7 +42,48 @@
 			path = vercelticsTests;
 			sourceTree = "<group>";
 		};
+		BAA200022FC0000000000002 /* SharedAmbient */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				BAA200102FC0000000000010 /* Exceptions for "SharedAmbient" folder in "verceltics" target */,
+				BAA200112FC0000000000011 /* Exceptions for "SharedAmbient" folder in "VercelticsWidgets" target */,
+			);
+			path = SharedAmbient;
+			sourceTree = "<group>";
+		};
+		BAA200032FC0000000000003 /* VercelticsWidgets */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				BAA2000F2FC000000000000F /* Exceptions for "VercelticsWidgets" folder in "VercelticsWidgets" target */,
+			);
+			path = VercelticsWidgets;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		BAA2000F2FC000000000000F /* Exceptions for "VercelticsWidgets" folder in "VercelticsWidgets" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = BAA200052FC0000000000005 /* VercelticsWidgets */;
+		};
+		BAA200102FC0000000000010 /* Exceptions for "SharedAmbient" folder in "verceltics" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				README.md,
+			);
+			target = BA46B9FC2F7E8DEA000E67FA /* verceltics */;
+		};
+		BAA200112FC0000000000011 /* Exceptions for "SharedAmbient" folder in "VercelticsWidgets" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				README.md,
+			);
+			target = BAA200052FC0000000000005 /* VercelticsWidgets */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		BA46B9FA2F7E8DEA000E67FA /* Frameworks */ = {
@@ -44,6 +101,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		BAA200042FC0000000000004 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -51,6 +115,8 @@
 			isa = PBXGroup;
 			children = (
 				BA46B9FF2F7E8DEA000E67FA /* verceltics */,
+				BAA200022FC0000000000002 /* SharedAmbient */,
+				BAA200032FC0000000000003 /* VercelticsWidgets */,
 				BAA100022FC0000000000002 /* vercelticsTests */,
 				BA46B9FE2F7E8DEA000E67FA /* Products */,
 			);
@@ -61,6 +127,7 @@
 			children = (
 				BA46B9FD2F7E8DEA000E67FA /* verceltics.app */,
 				BAA100012FC0000000000001 /* vercelticsTests.xctest */,
+				BAA200012FC0000000000001 /* VercelticsWidgets.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -75,13 +142,16 @@
 				BA46B9F92F7E8DEA000E67FA /* Sources */,
 				BA46B9FA2F7E8DEA000E67FA /* Frameworks */,
 				BA46B9FB2F7E8DEA000E67FA /* Resources */,
+				BAA2000B2FC000000000000B /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				BAA2000E2FC000000000000E /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				BA46B9FF2F7E8DEA000E67FA /* verceltics */,
+				BAA200022FC0000000000002 /* SharedAmbient */,
 			);
 			name = verceltics;
 			packageProductDependencies = (
@@ -112,6 +182,27 @@
 			productReference = BAA100012FC0000000000001 /* vercelticsTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		BAA200052FC0000000000005 /* VercelticsWidgets */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BAA2000A2FC000000000000A /* Build configuration list for PBXNativeTarget "VercelticsWidgets" */;
+			buildPhases = (
+				BAA200062FC0000000000006 /* Sources */,
+				BAA200042FC0000000000004 /* Frameworks */,
+				BAA200072FC0000000000007 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				BAA200022FC0000000000002 /* SharedAmbient */,
+				BAA200032FC0000000000003 /* VercelticsWidgets */,
+			);
+			name = VercelticsWidgets;
+			productName = VercelticsWidgets;
+			productReference = BAA200012FC0000000000001 /* VercelticsWidgets.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXContainerItemProxy section */
@@ -122,6 +213,13 @@
 			remoteGlobalIDString = BA46B9FC2F7E8DEA000E67FA;
 			remoteInfo = verceltics;
 		};
+		BAA2000D2FC000000000000D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BA46B9F52F7E8DEA000E67FA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = BAA200052FC0000000000005;
+			remoteInfo = VercelticsWidgets;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXTargetDependency section */
@@ -129,6 +227,11 @@
 			isa = PBXTargetDependency;
 			target = BA46B9FC2F7E8DEA000E67FA /* verceltics */;
 			targetProxy = BAA100082FC0000000000008 /* PBXContainerItemProxy */;
+		};
+		BAA2000E2FC000000000000E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = BAA200052FC0000000000005 /* VercelticsWidgets */;
+			targetProxy = BAA2000D2FC000000000000D /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -146,6 +249,9 @@
 					BAA100042FC0000000000004 = {
 						CreatedOnToolsVersion = 26.4;
 						TestTargetID = BA46B9FC2F7E8DEA000E67FA;
+					};
+					BAA200052FC0000000000005 = {
+						CreatedOnToolsVersion = 26.4;
 					};
 				};
 			};
@@ -168,6 +274,7 @@
 			targets = (
 				BA46B9FC2F7E8DEA000E67FA /* verceltics */,
 				BAA100042FC0000000000004 /* vercelticsTests */,
+				BAA200052FC0000000000005 /* VercelticsWidgets */,
 			);
 		};
 /* End PBXProject section */
@@ -187,6 +294,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		BAA200072FC0000000000007 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -198,6 +312,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		BAA100062FC0000000000006 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BAA200062FC0000000000006 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -446,6 +567,72 @@
 			};
 			name = Release;
 		};
+		BAA200082FC0000000000008 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 42;
+				DEVELOPMENT_TEAM = 23RV7FYH36;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = VercelticsWidgets/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Verceltics;
+				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 3.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.apoorvdarshan.verceltics.VercelticsWidgets;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		BAA200092FC0000000000009 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 42;
+				DEVELOPMENT_TEAM = 23RV7FYH36;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = VercelticsWidgets/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Verceltics;
+				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 3.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.apoorvdarshan.verceltics.VercelticsWidgets;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -472,6 +659,15 @@
 			buildConfigurations = (
 				BAA1000B2FC000000000000B /* Debug */,
 				BAA1000C2FC000000000000C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		BAA2000A2FC000000000000A /* Build configuration list for PBXNativeTarget "VercelticsWidgets" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BAA200082FC0000000000008 /* Debug */,
+				BAA200092FC0000000000009 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

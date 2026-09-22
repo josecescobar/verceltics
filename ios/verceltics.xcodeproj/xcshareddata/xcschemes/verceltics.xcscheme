@@ -35,6 +35,20 @@
                ReferencedContainer = "container:verceltics.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "BAA200052FC0000000000005"
+               BuildableName = "VercelticsWidgets.appex"
+               BlueprintName = "VercelticsWidgets"
+               ReferencedContainer = "container:verceltics.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
