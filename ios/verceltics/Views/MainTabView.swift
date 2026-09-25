@@ -129,7 +129,11 @@ struct MainTabView: View {
         }
         .onChange(of: scenePhase) { _, phase in
             guard phase == .active else { return }
+            applyPendingAmbientRoute()
             requestBackgroundRefreshForCurrentWorkspace()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: AmbientRoute.pendingDidChange)) { _ in
+            applyPendingAmbientRoute()
         }
         .onAppear {
             applyPendingAmbientRoute()

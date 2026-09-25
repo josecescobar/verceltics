@@ -13,6 +13,8 @@ nonisolated struct AmbientDeploymentSnapshot: Codable, Equatable, Sendable {
     let updatedAt: Date
     let targetURL: String?
     let commitSubject: String?
+    /// `production` / `preview` on Vercel; a branch elsewhere. Optional so older snapshots stay readable.
+    let target: String?
 
     init(
         id: String? = nil,
@@ -22,7 +24,8 @@ nonisolated struct AmbientDeploymentSnapshot: Codable, Equatable, Sendable {
         statusText: String,
         updatedAt: Date,
         targetURL: String? = nil,
-        commitSubject: String? = nil
+        commitSubject: String? = nil,
+        target: String? = nil
     ) {
         self.id = id ?? "\(provider.rawValue):\(projectName)"
         self.projectName = projectName
@@ -32,9 +35,16 @@ nonisolated struct AmbientDeploymentSnapshot: Codable, Equatable, Sendable {
         self.updatedAt = updatedAt
         self.targetURL = targetURL
         self.commitSubject = commitSubject
+        self.target = target
     }
 
-    var trackingKey: String { "\(provider.rawValue):\(id)" }
+    /// Stable identity for the in-memory map. The default `id` already includes the provider
+    /// prefix, so do not prefix it again — that used to produce `vercel:vercel:app` next to
+    /// `vercel:dpl_xxx` for the same project.
+    var trackingKey: String {
+        let prefix = "\(provider.rawValue):"
+        return id.hasPrefix(prefix) ? id : prefix + id
+    }
 
     init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -45,6 +55,7 @@ nonisolated struct AmbientDeploymentSnapshot: Codable, Equatable, Sendable {
         updatedAt = try container.decode(Date.self, forKey: .updatedAt)
         targetURL = try container.decodeIfPresent(String.self, forKey: .targetURL)
         commitSubject = try container.decodeIfPresent(String.self, forKey: .commitSubject)
+        target = try container.decodeIfPresent(String.self, forKey: .target)
         id = try container.decodeIfPresent(String.self, forKey: .id)
             ?? "\(provider.rawValue):\(projectName)"
     }

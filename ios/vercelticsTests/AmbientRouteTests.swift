@@ -20,6 +20,11 @@ final class AmbientRouteTests: XCTestCase {
     func testForeignSchemesAreIgnored() {
         XCTAssertNil(AmbientRoute.parse(URL(string: "https://verceltics.com/hosting")!))
         XCTAssertNil(AmbientRoute.parse(URL(string: "verceltics://unknown/path")!))
+        XCTAssertNil(AmbientRoute.parse(URL(string: "verceltics://deploy/not-a-thing")!))
+    }
+
+    func testBareDeployHostStillOpensHosting() {
+        XCTAssertEqual(AmbientRoute.parse(URL(string: "verceltics://deploy")!), .latestDeploy)
     }
 
     func testPendingWorkspaceIsStoredAndConsumedOnce() {

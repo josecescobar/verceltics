@@ -110,7 +110,8 @@ final class AmbientAwareness {
             project: snapshot.projectName,
             provider: snapshot.provider,
             previous: previous,
-            current: snapshot.state
+            current: snapshot.state,
+            observedAt: snapshot.updatedAt
         ) {
             Task { await AmbientAlertScheduler.schedule(alert) }
         }
@@ -125,22 +126,26 @@ final class AmbientAwareness {
     ) async {
         var tracker = DeploymentTracker()
         if let initial = deployments[key] {
-            _ = tracker.ingest(initial.state)
-            await present(key: key, outcome: .start(initial.state), snapshot: initial)
+            let outcome = tracker.ingest(initial.state)
+            await present(key: key, outcome: outcome, snapshot: initial)
         }
 
+        var consecutiveMisses = 0
         while !Task.isCancelled {
             let elapsed = Date.now.timeIntervalSince(startedAt)
-            let raw: String?
-            do {
-                raw = await fetchStatus()
+            let raw = await fetchStatus()
+            if raw == nil {
+                consecutiveMisses += 1
+            } else {
+                consecutiveMisses = 0
             }
             let provider = deployments[key]?.provider ?? .vercel
             let decision = DeploymentPollLoop.decide(
                 elapsed: elapsed,
                 rawStatus: raw,
                 provider: provider,
-                tracker: &tracker
+                tracker: &tracker,
+                consecutiveMisses: consecutiveMisses
             )
 
             if let raw {
@@ -157,7 +162,8 @@ final class AmbientAwareness {
                     statusText: raw,
                     updatedAt: .now,
                     targetURL: current.targetURL,
-                    commitSubject: current.commitSubject
+                    commitSubject: current.commitSubject,
+                    target: current.target
                 )
                 consider(next)
                 persist()
@@ -165,8 +171,14 @@ final class AmbientAwareness {
             }
 
             guard decision.continuePolling else {
-                if decision.timedOut || decision.disappeared {
+                if decision.disappeared {
+                    // The row is gone. Tear the surface down so it does not linger on a ghost.
                     cancelWatch(key)
+                } else if decision.timedOut {
+                    // The deploy may still be building; leave the Live Activity and let staleDate
+                    // age it rather than yanking it off the Lock Screen.
+                    pollTasks[key] = nil
+                    statusHandlers[key] = nil
                 }
                 break
             }
@@ -194,7 +206,7 @@ final class AmbientAwareness {
                 attributes: DeployActivityAttributes(
                     projectName: snapshot.projectName,
                     provider: snapshot.provider,
-                    target: nil,
+                    target: snapshot.target,
                     commitSubject: snapshot.commitSubject,
                     inspectorURL: snapshot.targetURL.flatMap(URL.init(string:))
                 )
@@ -299,7 +311,8 @@ extension RecentDeployment {
             statusText: displayState,
             updatedAt: date ?? .now,
             targetURL: inspectorUrl ?? url.map { "https://\($0)" },
-            commitSubject: meta?.githubCommitMessage
+            commitSubject: meta?.githubCommitMessage,
+            target: displayTarget
         )
     }
 }
@@ -314,7 +327,8 @@ extension HostingDeployment {
             statusText: status,
             updatedAt: createdAt ?? .now,
             targetURL: url,
-            commitSubject: commitMessage
+            commitSubject: commitMessage,
+            target: branch
         )
     }
 }

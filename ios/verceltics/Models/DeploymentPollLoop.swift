@@ -18,7 +18,8 @@ nonisolated enum DeploymentPollLoop {
         elapsed: TimeInterval,
         rawStatus: String?,
         provider: AccountProvider,
-        tracker: inout DeploymentTracker
+        tracker: inout DeploymentTracker,
+        consecutiveMisses: Int = 0
     ) -> DeploymentPollDecision {
         if DeploymentPollPolicy.shouldTimeOut(elapsed: elapsed) {
             return DeploymentPollDecision(
@@ -30,15 +31,17 @@ nonisolated enum DeploymentPollLoop {
             )
         }
 
-        // A missing row is not a failure. The deploy may have been deleted or paged out of the
-        // list the API returns; treating that as a crash would page someone for nothing.
+        // A missing row is not a failure. The deploy may have been deleted, paged out of the
+        // list, or hidden by a transient `try?`. One empty read is a blip; several in a row
+        // means it is gone.
         guard let rawStatus else {
+            let disappeared = consecutiveMisses >= DeploymentPollPolicy.missingStatusLimit
             return DeploymentPollDecision(
                 outcome: .ignored,
-                continuePolling: false,
-                nextInterval: 0,
+                continuePolling: !disappeared,
+                nextInterval: DeploymentPollPolicy.interval(elapsed: elapsed),
                 timedOut: false,
-                disappeared: true
+                disappeared: disappeared
             )
         }
 

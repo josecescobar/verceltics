@@ -53,6 +53,10 @@ nonisolated enum AmbientAlertRules {
     /// renewal window produces a handful of reminders rather than one per refresh.
     static let domainExpiryThresholds: [Int] = [30, 14, 7, 3, 1]
 
+    /// A first-read failure older than this is history, not news. Opening five projects
+    /// whose last deploys failed last week must not schedule five notifications.
+    static let firstReadAlertMaxAge: TimeInterval = 6 * 60 * 60
+
     /// Raise an alert only when a deployment actually settles, and only when the transition is one
     /// the user has not already seen in the app.
     ///
@@ -61,17 +65,24 @@ nonisolated enum AmbientAlertRules {
     ///   - current: the state just observed.
     ///   - notifyOnSuccess: successful deploys are the common case and mostly noise, so they are
     ///     opt-in.
+    ///   - observedAt: when the current status was produced. A first-read failure older than
+    ///     `firstReadAlertMaxAge` is treated as already-seen history.
     static func deploymentAlert(
         project: String,
         provider: AccountProvider,
         previous: DeploymentState?,
         current: DeploymentState,
-        notifyOnSuccess: Bool = false
+        notifyOnSuccess: Bool = false,
+        observedAt: Date? = nil,
+        now: Date = .now
     ) -> AmbientAlert? {
         // Only a fresh transition is newsworthy. A status that was already terminal last time we
         // looked has been reported already.
         guard current.isTerminal else { return nil }
         if let previous, previous.isTerminal { return nil }
+        if previous == nil, let observedAt, now.timeIntervalSince(observedAt) > firstReadAlertMaxAge {
+            return nil
+        }
 
         switch current {
         case .failed:

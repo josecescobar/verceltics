@@ -72,6 +72,10 @@ nonisolated enum DeploymentPollPolicy {
     /// Give up tracking after this long so a stuck deployment cannot poll forever.
     static let timeout: TimeInterval = 20 * 60
 
+    /// A single missing poll is usually a blip (`try?`, a truncated list). Only treat the
+    /// deploy as gone after this many consecutive empty reads.
+    static let missingStatusLimit = 3
+
     static func interval(elapsed: TimeInterval) -> TimeInterval {
         switch max(0, elapsed) {
         case ..<60: 5

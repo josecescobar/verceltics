@@ -127,7 +127,35 @@ final class AmbientSnapshotTests: XCTestCase {
         """
         let snapshot = try AmbientSnapshotCodec.decode(Data(json.utf8))
         XCTAssertEqual(snapshot.deployments.first?.id, "vercel:verceltics")
+        XCTAssertEqual(snapshot.deployments.first?.trackingKey, "vercel:verceltics")
+        XCTAssertNil(snapshot.deployments.first?.target)
         XCTAssertTrue(snapshot.domains.isEmpty)
+    }
+
+    func testTrackingKeyDoesNotDoublePrefixASyntheticId() {
+        let snapshot = AmbientDeploymentSnapshot(
+            projectName: "verceltics",
+            provider: .vercel,
+            state: .ready,
+            statusText: "READY",
+            updatedAt: capturedAt
+        )
+        XCTAssertEqual(snapshot.id, "vercel:verceltics")
+        XCTAssertEqual(snapshot.trackingKey, "vercel:verceltics")
+    }
+
+    func testTrackingKeyPrefixesAProviderDeploymentId() {
+        let snapshot = AmbientDeploymentSnapshot(
+            id: "dpl_abc",
+            projectName: "verceltics",
+            provider: .vercel,
+            state: .building,
+            statusText: "BUILDING",
+            updatedAt: capturedAt,
+            target: "Production"
+        )
+        XCTAssertEqual(snapshot.trackingKey, "vercel:dpl_abc")
+        XCTAssertEqual(snapshot.target, "Production")
     }
 
     func testDomainsAreKeptSoonestFirstAndBounded() {

@@ -36,6 +36,17 @@ final class DeployActivityController {
     private func start(state: DeploymentState, statusText: String) async {
         guard Self.isAvailable, activity == nil else { return }
 
+        // After a relaunch, iOS may still be showing the previous activity for this project.
+        // Adopt it instead of requesting a second one.
+        if let existing = Activity<DeployActivityAttributes>.activities.first(where: {
+            $0.attributes.projectName == attributes.projectName
+                && $0.attributes.provider == attributes.provider
+        }) {
+            activity = existing
+            await update(state: state, statusText: statusText, finished: false)
+            return
+        }
+
         let content = ActivityContent(
             state: DeployActivityAttributes.ContentState(
                 state: state,

@@ -53,6 +53,34 @@ final class AmbientAlertRulesTests: XCTestCase {
         )
     }
 
+    func testAStaleFirstReadFailureDoesNotAlert() {
+        let observedAt = now.addingTimeInterval(-(AmbientAlertRules.firstReadAlertMaxAge + 60))
+        XCTAssertNil(
+            AmbientAlertRules.deploymentAlert(
+                project: "verceltics",
+                provider: .netlify,
+                previous: nil,
+                current: .failed,
+                observedAt: observedAt,
+                now: now
+            )
+        )
+    }
+
+    func testARecentFirstReadFailureStillAlerts() {
+        XCTAssertEqual(
+            AmbientAlertRules.deploymentAlert(
+                project: "verceltics",
+                provider: .netlify,
+                previous: nil,
+                current: .failed,
+                observedAt: now.addingTimeInterval(-60),
+                now: now
+            ),
+            .deploymentFailed(project: "verceltics", provider: .netlify)
+        )
+    }
+
     func testSuccessIsOptIn() {
         XCTAssertNil(
             AmbientAlertRules.deploymentAlert(
@@ -192,6 +220,16 @@ final class AmbientAlertRulesTests: XCTestCase {
             AmbientAlert.domainExpiring(domain: "Verceltics.com", daysRemaining: 7).dedupeKey,
             AmbientAlert.domainExpiring(domain: "verceltics.com", daysRemaining: 7).dedupeKey
         )
+    }
+
+    func testAlertLogRemembersAndForgetsAKey() {
+        let defaults = UserDefaults(suiteName: "AmbientAlertLogTests.\(UUID().uuidString)")!
+        let key = AmbientAlert.domainExpiring(domain: "verceltics.com", daysRemaining: 7).dedupeKey
+        XCTAssertFalse(AmbientAlertLog.contains(key, defaults: defaults))
+        AmbientAlertLog.remember(key, defaults: defaults)
+        XCTAssertTrue(AmbientAlertLog.contains(key, defaults: defaults))
+        AmbientAlertLog.forget(key, defaults: defaults)
+        XCTAssertFalse(AmbientAlertLog.contains(key, defaults: defaults))
     }
 
     func testEveryAlertHasCopy() {

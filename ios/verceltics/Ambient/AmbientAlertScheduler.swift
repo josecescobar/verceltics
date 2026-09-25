@@ -27,6 +27,7 @@ nonisolated enum AmbientAlertScheduler {
     static func schedule(_ alert: AmbientAlert) async {
         let center = UNUserNotificationCenter.current()
         let identifier = alert.dedupeKey
+        guard !AmbientAlertLog.contains(identifier) else { return }
 
         let pending = await center.pendingNotificationRequests()
         guard !pending.contains(where: { $0.identifier == identifier }) else { return }
@@ -44,15 +45,21 @@ nonisolated enum AmbientAlertScheduler {
         content.sound = .default
         content.interruptionLevel = alert.isUrgent ? .timeSensitive : .active
 
-        try? await center.add(
-            UNNotificationRequest(identifier: identifier, content: content, trigger: nil)
-        )
+        do {
+            try await center.add(
+                UNNotificationRequest(identifier: identifier, content: content, trigger: nil)
+            )
+            AmbientAlertLog.remember(identifier)
+        } catch {
+            return
+        }
     }
 
     static func forget(_ alert: AmbientAlert) {
         let center = UNUserNotificationCenter.current()
         center.removePendingNotificationRequests(withIdentifiers: [alert.dedupeKey])
         center.removeDeliveredNotifications(withIdentifiers: [alert.dedupeKey])
+        AmbientAlertLog.forget(alert.dedupeKey)
     }
 #else
     static func schedule(_ alert: AmbientAlert) async {}

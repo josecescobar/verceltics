@@ -38,14 +38,33 @@ final class DeploymentPollLoopTests: XCTestCase {
         XCTAssertFalse(decision.continuePolling)
     }
 
-    func testAMissingRowStopsWithoutCountingAsAFailure() {
+    func testASingleMissingReadKeepsPolling() {
         var tracker = DeploymentTracker()
         _ = tracker.ingest(.building)
         let decision = DeploymentPollLoop.decide(
             elapsed: 10,
             rawStatus: nil,
             provider: .vercel,
-            tracker: &tracker
+            tracker: &tracker,
+            consecutiveMisses: 1
+        )
+
+        XCTAssertEqual(decision.outcome, .ignored)
+        XCTAssertFalse(decision.disappeared)
+        XCTAssertTrue(decision.continuePolling)
+        XCTAssertFalse(decision.timedOut)
+        XCTAssertTrue(tracker.isTracking)
+    }
+
+    func testRepeatedMissingReadsCountAsDisappeared() {
+        var tracker = DeploymentTracker()
+        _ = tracker.ingest(.building)
+        let decision = DeploymentPollLoop.decide(
+            elapsed: 10,
+            rawStatus: nil,
+            provider: .vercel,
+            tracker: &tracker,
+            consecutiveMisses: DeploymentPollPolicy.missingStatusLimit
         )
 
         XCTAssertEqual(decision.outcome, .ignored)

@@ -9,6 +9,7 @@ import Foundation
 nonisolated enum AmbientRoute: Equatable, Sendable {
     static let scheme = "verceltics"
     static let pendingWorkspaceKey = "ambient.pendingWorkspace"
+    static let pendingDidChange = Notification.Name("ambient.pendingWorkspaceDidChange")
 
     case workspace(PrimaryWorkspace)
     case latestDeploy
@@ -38,6 +39,7 @@ nonisolated enum AmbientRoute: Equatable, Sendable {
             return .workspace(workspace)
         }
         if host == "deploy" {
+            guard path.isEmpty || path == ["latest"] else { return nil }
             return .latestDeploy
         }
         return nil
@@ -46,6 +48,7 @@ nonisolated enum AmbientRoute: Equatable, Sendable {
     static func store(_ route: AmbientRoute, defaults: UserDefaults = .standard) {
         defaults.set(route.workspace.rawValue, forKey: lastPrimaryWorkspaceKey)
         defaults.set(route.workspace.rawValue, forKey: pendingWorkspaceKey)
+        NotificationCenter.default.post(name: pendingDidChange, object: nil)
     }
 
     static func consumePendingWorkspace(defaults: UserDefaults = .standard) -> PrimaryWorkspace? {
